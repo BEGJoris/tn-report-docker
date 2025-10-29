@@ -1,0 +1,20 @@
+services:
+  latex:
+    image: texlive/texlive
+    working_dir: /data
+    volumes:
+      - ./template:/data
+    environment:
+      - TEX_FILE=${TEX_FILE:-main.tex}
+      - BIB_FILE=${BIB_FILE:-}
+      - BIB_PATH=${BIB_PATH:-.}
+      - BUILD_DIR=${BUILD_DIR:-dist}
+    command: >
+      sh -c "
+        echo '📄 Compilation du fichier : ${TEX_FILE}';
+        if [ -n '${BIB_FILE}' ]; then
+          echo '🔗 Utilisation du fichier bib : ${BIB_PATH}/${BIB_FILE}';
+          cp ${BIB_PATH}/${BIB_FILE} .;
+        fi;
+        latexmk -pdf -pvc -interaction=nonstopmode -output-directory=${BUILD_DIR} ${TEX_FILE};
+      "
